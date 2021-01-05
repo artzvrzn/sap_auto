@@ -12,13 +12,24 @@ print('start')
 # <Win32Window left="-8", top="-8", width="1936", height="1056", title="In-house processing 2300">
 
 
-def press_the_button(button, reg=None):
-    while True:
-        button_location = gui.locateOnScreen(button, region=reg)
-        print(reg)
-        if button_location is not None:
-            gui.click(button_location)
-            break
+def press_the_button(button, reg=None, x=None, y=None, duration=0):
+    if not x or not y:
+        while True:
+            button_location = gui.locateOnScreen(button, region=reg)
+            print(reg)
+            if button_location is not None:
+                gui.click(button_location)
+                gui.sleep(0.1)
+                break
+    else:
+        while True:
+            button_location = gui.locateOnScreen(button, region=reg)
+            print(reg)
+            if button_location is not None:
+                gui.moveTo(x=x, y=y, duration=duration)
+                gui.click()
+                gui.sleep(0.1)
+                break
 
 
 class Shipment:
@@ -103,27 +114,11 @@ class Shipment:
                         self.print_docs_pressed = True
                 elif self.print_docs_pressed:
                     # gui.sleep(0.1)
-                # gui.moveTo(x=247, y=300, duration=0)
-                # gui.click()
-                # gui.sleep(0.1)
-                # gui.press('del')
-                # gui.sleep(0.1)
-                # gui.press('2')
                     gui.sleep(0.1)
-                    while True:
-                        if gui.locateOnScreen(self.processing, region=(20, 360, 180, 400)) is not None:
-                            gui.moveTo(x=37, y=387, duration=0)
-                            gui.click()
-                            gui.sleep(0.1)
-                            break
+                    press_the_button(self.processing, reg=(20, 360, 180, 400), x=37, y=387)
                     gui.press('f8')
                     gui.sleep(0.1)
-                    while True:
-                        if gui.locateOnScreen(self.zaby_zslr, region=(5, 152, 30, 220)) is not None:
-                            gui.moveTo(x=16, y=208, duration=0)
-                            gui.click()
-                            gui.sleep(0.1)
-                            break
+                    press_the_button(self.zaby_zslr, reg=(5, 152, 30, 220), x=16, y=208)
                     gui.hotkey('shift', 'f2')
                     gui.sleep(0.1)
                     while True:
@@ -133,6 +128,15 @@ class Shipment:
                             # gui.moveTo(x=17, y=208, duration=0)
                             # gui.click()
                             break
+                    gui.sleep(0.25)
+                    gui.moveTo(x=247, y=300, duration=0)
+                    gui.click()
+                    gui.sleep(0.1)
+                    gui.press('del')
+                    gui.sleep(0.1)
+                    gui.press('2')
+                    gui.press('f8')
+                    gui.sleep(0.1)
                     self.zslr_input = False
                     self.print_docs_pressed = False
                     break
