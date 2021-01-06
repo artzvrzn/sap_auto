@@ -2,9 +2,18 @@ import pyautogui as gui
 import pygetwindow as gw
 import keyboard
 from sys import exit
-import argparse
+import logging
 
-print('start')
+logger = logging.getLogger('log')
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
+
+logger.debug('start')
 # gui.moveTo(x=58, y=21, duration=0) shipment
 # gui.moveTo(x=58, y=21, duration=0) change
 # print(gui.position())
@@ -12,22 +21,30 @@ print('start')
 # <Win32Window left="-8", top="-8", width="1936", height="1056", title="In-house processing 2300">
 
 
-def press_the_button(button, reg=None, x=None, y=None, duration=0):
-    if not x or not y:
+def press_the_button(image, reg=None, button=None, x=None, y=None, duration=0):
+    if x is None and y is None and button is None:
         while True:
-            button_location = gui.locateOnScreen(button, region=reg)
-            print(reg)
-            if button_location is not None:
-                gui.click(button_location)
+            image_location = gui.locateOnScreen(image, region=reg)
+            print('first')
+            if image_location is not None:
+                gui.click(image_location)
                 gui.sleep(0.1)
                 break
-    else:
+    elif button is None:
         while True:
-            button_location = gui.locateOnScreen(button, region=reg)
-            print(reg)
-            if button_location is not None:
+            image_location = gui.locateOnScreen(image, region=reg)
+            print('second')
+            if image_location is not None:
                 gui.moveTo(x=x, y=y, duration=duration)
                 gui.click()
+                gui.sleep(0.1)
+                break
+    elif button is not None:
+        while True:
+            image_location = gui.locateOnScreen(image, region=reg)
+            print('third')
+            if image_location is not None:
+                gui.press(button)
                 gui.sleep(0.1)
                 break
 
@@ -41,21 +58,26 @@ class Shipment:
         self.output = 'screenshots\\Output.png'
         self.output_type = 'screenshots\\Output_type.png'
         self.processing = 'screenshots\\Processing.png'
+        self.processing_marked = 'screenshots\\Processing_marked.png'
         self.green = 'screenshots\\Green.png'
         self.zaby_zslr = 'screenshots\\ZABY_ZSLR.png'
+        self.zslr = 'screenshots\\ZSLR.png'
         self.ship_button_pressed = False
         self.change_button_pressed = False
         self.message_button_pressed = False
         self.output_opened = False
         self.zslr_input = False
         self.print_docs_pressed = False
+        self.processing_1 = False
+        self.processing_2 = False
 
 
     def open_output(self):
+        logger.debug('open_output')
         while True:
             if not self.ship_button_pressed:
                 gui.sleep(0.5)
-                print(gw.getActiveWindow().title)
+                logger.debug('%s', gw.getActiveWindow().title)
                 if gw.getActiveWindow().title.endswith('Display: Overview'):
                     shipment = gui.moveTo(x=58, y=21, duration=0)
                     gui.click(shipment)
@@ -71,75 +93,68 @@ class Shipment:
                 break
 
     def zslr_inputting(self):
-        if keyboard.is_pressed('ctrl+0'):
-            print('key was pressed')
-            self.open_output()
-            while True:
-                if gw.getActiveWindow().title.endswith('x-doc: Output') and self.output_opened and not self.zslr_input:
-                    zslr = gui.moveTo(x=70, y=234, duration=0)
-                    gui.click(zslr)
-                    gui.sleep(0.25)
-                    gui.write('zslr')
-                    gui.write('Print output')
-                    gui.press('tab', presses=3)
-                    gui.write('RU')
-                    gui.press('enter', presses=2, interval=0.25)
-                    gui.hotkey('ctrl', 's')
-                    gui.sleep(0.25)
-                    gui.write('BYMSQWHL02')
-                    gui.press('tab', presses=2)
-                    gui.press('space')
-                    gui.press('f3')
-                    gui.sleep(0.25)
-                    gui.hotkey('ctrl', 's')
-                    self.zslr_input = True
-                    print('end')
-                    gui.sleep(1)
-                    self.ship_button_pressed = False
-                    self.change_button_pressed = False
-                    self.message_button_pressed = False
-                    self.output_opened = False
-                    break
+        self.open_output()
+        while True:
+            if gw.getActiveWindow().title.endswith('x-doc: Output') and self.output_opened and not self.zslr_input:
+                gui.click(x=70, y=275, duration=0) # testing parameters in zslr is here (change to 275)
+                gui.sleep(0.25)
+                gui.write('zslr')
+                gui.write('Print output')
+                gui.press('tab', presses=3)
+                gui.write('RU')
+                gui.press('enter', presses=2, interval=0.25)
+                gui.hotkey('ctrl', 's')
+                gui.sleep(0.25)
+                gui.write('BYMSQWHL02')
+                gui.press('tab', presses=2)
+                gui.press('space')
+                gui.press('f3')
+                gui.sleep(0.25)
+                gui.hotkey('ctrl', 's')
+                self.zslr_input = True
+                logger.debug('zslr_inputting final')
+                gui.sleep(1)
+                self.ship_button_pressed = False
+                self.change_button_pressed = False
+                self.message_button_pressed = False
+                self.output_opened = False
+                break
 
     def print_docs(self):
-        if keyboard.is_pressed('ctrl+0'):
-            print('key was pressed')
-            self.zslr_inputting()
-            while True:
-                if self.zslr_input and not self.print_docs_pressed:
-                    gui.sleep(0.25)
-                    print(gw.getActiveWindow().title)
-                    if gw.getActiveWindow().title.startswith('In-house processing'):
-                        gui.hotkey('shift', 'f9')
-                        self.print_docs_pressed = True
-                elif self.print_docs_pressed:
-                    # gui.sleep(0.1)
-                    gui.sleep(0.1)
-                    press_the_button(self.processing, reg=(20, 360, 180, 400), x=37, y=387)
-                    gui.press('f8')
-                    gui.sleep(0.1)
-                    press_the_button(self.zaby_zslr, reg=(5, 152, 30, 220), x=16, y=208)
-                    gui.hotkey('shift', 'f2')
-                    gui.sleep(0.1)
-                    while True:
-                        if gui.locateOnScreen(self.green, region=(300, 190, 400, 225)) is not None:
-                            gui.sleep(0.25)
-                            gui.press('f3')
-                            # gui.moveTo(x=17, y=208, duration=0)
-                            # gui.click()
-                            break
-                    gui.sleep(0.25)
-                    gui.moveTo(x=247, y=300, duration=0)
-                    gui.click()
-                    gui.sleep(0.1)
-                    gui.press('del')
-                    gui.sleep(0.1)
-                    gui.press('2')
-                    gui.press('f8')
-                    gui.sleep(0.1)
-                    self.zslr_input = False
-                    self.print_docs_pressed = False
-                    break
+        # self.zslr_inputting()
+        while True:
+            if self.zslr_input and not self.print_docs_pressed:
+                gui.sleep(0.25)
+                logger.debug('%s', gw.getActiveWindow().title)
+                if gw.getActiveWindow().title.startswith('In-house processing'):
+                    gui.hotkey('shift', 'f9')
+                    self.print_docs_pressed = True
+            elif self.print_docs_pressed:
+                # gui.sleep(0.1)
+                gui.sleep(0.25)
+                press_the_button(self.processing, reg=(20, 360, 180, 400), x=37, y=387)
+                gui.press('f8')
+                gui.sleep(0.1)
+                press_the_button(self.zaby_zslr, reg=(5, 152, 30, 220), x=16, y=208)
+                gui.hotkey('shift', 'f2')
+                gui.sleep(0.1)
+                press_the_button(self.green, reg=(300, 190, 400, 225), button='f3')
+                press_the_button(self.processing_marked, reg=(20, 360, 180, 400), x=246, y=300)
+                gui.press('del')
+                gui.sleep(0.1)
+                gui.press('2')
+                gui.sleep(0.1)
+                gui.press('f8')
+                gui.sleep(0.1)
+                press_the_button(self.zslr, reg=(5, 152, 30, 220), button='space')
+                gui.hotkey('shift', 'f2')
+                gui.sleep(0.1)
+                press_the_button(self.green, reg=(300, 190, 400, 225), button='f3')
+                gui.press('f3')
+                gui.sleep(0.25)
+                self.zslr_input = False
+                self.print_docs_pressed = False
+                break
 
 
             #     gui.press('tab', interval=0.25)
@@ -163,10 +178,15 @@ class Shipment:
 
 sh = Shipment()
 while True:
-    sh.print_docs()
-
-    if keyboard.is_pressed('ctrl+9'):
-        print('stop')
+    if keyboard.is_pressed('ctrl+0'):
+        logger.debug('zslr_inputting')
+        sh.zslr_inputting()
+    elif keyboard.is_pressed('ctrl+9'):
+        logger.debug('print_docs')
+        sh.zslr_input = True
+        sh.print_docs()
+    elif keyboard.is_pressed('ctrl+8'):
+        logger.debug('stop')
         exit()
 # sh.print_docs()
 
