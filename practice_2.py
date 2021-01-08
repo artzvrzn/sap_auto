@@ -62,6 +62,7 @@ class Shipment:
         self.green = 'screenshots\\Green.png'
         self.zaby_zslr = 'screenshots\\ZABY_ZSLR.png'
         self.zslr = 'screenshots\\ZSLR.png'
+        self.mark = 'screenshots\\mark.png'
         self.ship_button_pressed = False
         self.change_button_pressed = False
         self.message_button_pressed = False
@@ -70,6 +71,7 @@ class Shipment:
         self.print_docs_pressed = False
         self.processing_1 = False
         self.processing_2 = False
+        self.print_docs_status = False
 
 
     def open_output(self):
@@ -97,7 +99,7 @@ class Shipment:
         while True:
             if gw.getActiveWindow().title.endswith('x-doc: Output') and self.output_opened and not self.zslr_input:
                 gui.click(x=70, y=275, duration=0) # testing parameters in zslr is here (change to 275)
-                gui.sleep(0.25)
+                gui.sleep(0.4)
                 gui.write('zslr')
                 gui.write('Print output')
                 gui.press('tab', presses=3)
@@ -148,13 +150,27 @@ class Shipment:
                 gui.sleep(0.1)
                 press_the_button(self.zslr, reg=(5, 152, 30, 220), button='space')
                 gui.hotkey('shift', 'f2')
-                gui.sleep(0.1)
-                press_the_button(self.green, reg=(300, 190, 400, 225), button='f3')
-                gui.press('f3')
                 gui.sleep(0.25)
+                press_the_button(self.mark, reg=(0, 1000, 50, 1060), button='esc')
                 self.zslr_input = False
                 self.print_docs_pressed = False
+                self.print_docs_status = True
                 break
+
+    def zlpc_inputting(self):
+        while True:
+            if self.print_docs_status:
+                if gw.getActiveWindow().title.startswith('Messages'):
+                    gui.press('f3')
+                elif gw.getActiveWindow().title.startswith('In-house processing'):
+                    zlpc_window = gw.getWindowsWithTitle('ZLPC')[0]
+                    zlpc_window.activate()
+                elif gw.getActiveWindow().title.startswith('ZLPC'):
+                    gui.press('f2')
+                    self.print_docs_status = False
+                    break
+                elif keyboard.is_pressed('ctrl+='):
+                    break
 
 
             #     gui.press('tab', interval=0.25)
@@ -178,15 +194,22 @@ class Shipment:
 
 sh = Shipment()
 while True:
-    if keyboard.is_pressed('ctrl+0'):
+    if keyboard.is_pressed('ctrl+8'):
         logger.debug('zslr_inputting')
         sh.zslr_inputting()
+        logger.debug('stop')
     elif keyboard.is_pressed('ctrl+9'):
         logger.debug('print_docs')
-        sh.zslr_input = True
         sh.print_docs()
-    elif keyboard.is_pressed('ctrl+8'):
         logger.debug('stop')
+    elif keyboard.is_pressed('ctrl+0'):
+        logger.debug('zslr + print_docs')
+        sh.zslr_inputting()
+        sh.print_docs()
+        sh.zlpc_inputting()
+        logger.debug('stop')
+    elif keyboard.is_pressed('ctrl+-'):
+        logger.debug('exit')
         exit()
 # sh.print_docs()
 
