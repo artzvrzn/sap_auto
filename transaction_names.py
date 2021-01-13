@@ -13,12 +13,11 @@ transaction_names = {'sap_easy_access': 'sap_transactions\\sap_easy_access.png',
                      'new_mode': 'sap_transactions\\new_mode.png',
                      }
 
-titles_list = ['ZLPC',
-               'In-house processing 2300',
-               'Stock transfer: Warehouse 270',
-               'Replenish picking area in warehouse 270 to maximum quantity',
-               'In-house processing',
-               'Logistic Documents Print Program',
-               'Replenish picking area in warehouse 270 to maximum quantity P03 (1)',
-               'Load processing cockpit: Warehouse 270 - Minsk PRD P03',
-               ]
+titles_tuple = ('ZLPC',
+                'In-house processing 2300',
+                'Stock transfer: Warehouse 270',
+                'Replenish picking area in warehouse 270 to maximum quantity',
+                'In-house processing',
+                'Logistic Documents Print Program',
+                'Load processing cockpit: Warehouse 270 - Minsk PRD P03'
+                )

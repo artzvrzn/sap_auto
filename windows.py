@@ -1,6 +1,6 @@
 import pygetwindow as gw
 import pyautogui as gui
-from transaction_names import transaction_names, names_region, titles_list
+from transaction_names import transaction_names, names_region, titles_tuple
 from time import time
 
 # print(locals().get('transaction_name').title)
@@ -28,11 +28,10 @@ class Transaction:
                 raise IndexError
         except IndexError:
             print('Seems there is no opened main SAP window')
-
-            for transaction in titles_list:
-                if transaction == 'ZLPC':
+            for transaction in gw.getAllTitles():
+                if transaction.startswith('ZLPC'):
                     continue
-                elif transaction in gw.getAllTitles():
+                elif transaction.startswith(titles_tuple):
                     temp_transaction = gw.getWindowsWithTitle(str(transaction))[0]
                     temp_transaction.activate()
                     while True:
@@ -41,7 +40,10 @@ class Transaction:
                         gui.hotkey('ctrl', 'n')
                         gui.locateOnScreen(transaction_names['sap_easy_access'], region=names_region)
                         break
+                    print('konec')
                     break
+                else:
+                    print('Не могу открыть')
 
     def zihp(self):
         self.sap_access()
