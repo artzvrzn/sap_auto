@@ -3,6 +3,7 @@ import pygetwindow as gw
 import keyboard
 from sys import exit
 import logging
+from windows import Transaction
 
 logger = logging.getLogger('log')
 logger.setLevel(logging.DEBUG)
@@ -101,6 +102,7 @@ class Shipment:
                 gui.click(x=70, y=275, duration=0) # testing parameters in zslr is here (change to 275)
                 gui.sleep(0.4)
                 gui.write('zslr')
+                gui.press('tab')
                 gui.write('Print output')
                 gui.press('tab', presses=3)
                 gui.write('RU')
@@ -190,34 +192,38 @@ class Shipment:
 
 
 
+if __name__ == '__main__':
+
+    sh = Shipment()
+    tr = Transaction()
+
+    while True:
+        if keyboard.is_pressed('ctrl+8'):
+            logger.debug('zslr_inputting')
+            sh.zslr_inputting()
+            logger.debug('stop')
+        elif keyboard.is_pressed('ctrl+9'):
+            logger.debug('print_docs')
+            sh.print_docs()
+            logger.debug('stop')
+        elif keyboard.is_pressed('ctrl+0'):
+            logger.debug('zslr + print_docs')
+            sh.zslr_inputting()
+            sh.print_docs()
+            # sh.zlpc_inputting()
+            logger.debug('stop')
+        elif keyboard.is_pressed('ctrl+-'):
+            logger.debug('exit')
+            exit()
+        elif keyboard.is_pressed('ctrl+7'):
+            tr.zihp()
+    # sh.print_docs()
 
 
-sh = Shipment()
-while True:
-    if keyboard.is_pressed('ctrl+8'):
-        logger.debug('zslr_inputting')
-        sh.zslr_inputting()
-        logger.debug('stop')
-    elif keyboard.is_pressed('ctrl+9'):
-        logger.debug('print_docs')
-        sh.print_docs()
-        logger.debug('stop')
-    elif keyboard.is_pressed('ctrl+0'):
-        logger.debug('zslr + print_docs')
-        sh.zslr_inputting()
-        sh.print_docs()
-        sh.zlpc_inputting()
-        logger.debug('stop')
-    elif keyboard.is_pressed('ctrl+-'):
-        logger.debug('exit')
-        exit()
-# sh.print_docs()
+    # sh.print_docs()-
+    # while True:
+    #     gui.sleep(0.5)
+    #     print(gw.getActiveWindow())
 
-
-# sh.print_docs()-
-# while True:
-#     gui.sleep(0.5)
-#     print(gw.getActiveWindow())
-
-# new_win = gw.getWindowsWithTitle('CCH TO x-doc 5010775587 Display: Overview')
-# print()
+    # new_win = gw.getWindowsWithTitle('CCH TO x-doc 5010775587 Display: Overview')
+    # print()
