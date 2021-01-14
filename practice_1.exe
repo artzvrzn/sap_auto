@@ -1,0 +1,7 @@
+import pyautogui as gui
+
+print(gui.position())
+# gui.moveTo(x=58, y=21, duration=0)
+# print(gui.position())
+shipment_button = gui.locateOnScreen('screenshots\\Shipment.png')
+print(shipment_button)

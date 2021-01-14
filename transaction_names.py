@@ -19,6 +19,10 @@ titles_tuple = ('ZLPC',
                 'Replenish picking area in warehouse 270 to maximum quantity',
                 'In-house processing',
                 'Logistic Documents Print Program',
-                'Load processing cockpit: Warehouse 270 - Minsk PRD P03',
-                'In-house processing P03'
+                'Load processing cockpit',
+                'Messages for Shipments',
+                'Transfer Orders: List by Storage Type',
+                'Workpackagemonitor 2007',
+                'WM: Stock Transfer',
+                'Storage capacity',
                 )
