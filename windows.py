@@ -4,7 +4,9 @@ from transaction_names import transaction_names, names_region, titles_tuple
 from time import time
 
 # print(locals().get('transaction_name').title)
-print(gw.getAllTitles())
+print(gui.getAllTitles())
+
+
 # print(gw.getWindowsWithTitle('zlpc')[0])
 
 # zlpc = gw.getWindowsWithTitle('ZLPC')[0]
@@ -12,15 +14,59 @@ print(gw.getAllTitles())
 # sap_main = gw.getWindowsWithTitle('SAP Easy Access')[0]
 # zlt10 = gw.getWindowsWithTitle('Stock transfer: Warehouse 270')[0]
 
+def hotkey(image, reg, button1, button2):
+    while True:
+        image_location = gui.locateOnScreen(image, region=reg)
+        if image_location is not None:
+            gui.hotkey(button1, button2)
+            gui.sleep(0.1)
+            break
 
 class Transaction:
+
+    def _new_mode(self):
+
+        for transaction in gui.getAllTitles():
+            if transaction.startswith('ZLPC'):
+                print(1)
+                continue
+            elif transaction.startswith(titles_tuple):
+                print(2)
+
+                temp_transaction = gui.getWindowsWithTitle(str(transaction))[0]
+                temp_transaction.activate()
+                hotkey(transaction_names['new_mode'], (410, 30, 575, 60), 'ctrl', 'n')
+                while gui.getActiveWindowTitle == temp_transaction:
+                    print(gui.getActiveWindowTitle)
+                    gui.sleep(0.25)
+                    print(3)
+
+                print('test')
+                if 'Information' in gui.getAllTitles():
+                    print(6)
+                    dialog = gui.confirm(text='Много окошек. Закрываю одно',
+                                         title='Limit of tabs',
+                                         buttons=['OK', 'Cancel'])
+                    if dialog == 'OK':
+                        information = gw.getWindowsWithTitle('Information')[0]
+                        print(information)
+                        gui.press('esc')
+                        print(temp_transaction)
+                        temp_transaction.close()
+                        print(5)
+                        continue
+                    else:
+                        exit()
+                elif gui.locateOnScreen(transaction_names['sap_easy_access'], region=names_region):
+                    print(4)
+                    break
 
     def sap_access(self):
         try:
             trigger = False
-            for transaction in gw.getAllTitles():
-                if transaction.startswith('SAP Easy Access'):
-                    sap_main = gw.getWindowsWithTitle(str(transaction))[0]
+            for transaction in gui.getAllTitles():
+                if 'SAP Easy Access' in transaction:
+                    sap_main = gui.getWindowsWithTitle(str(transaction))[0]
                     sap_main.activate()
                     trigger = True
                     break
@@ -28,22 +74,7 @@ class Transaction:
                 raise IndexError
         except IndexError:
             print('Seems there is no opened main SAP window')
-            for transaction in gw.getAllTitles():
-                if transaction.startswith('ZLPC'):
-                    continue
-                elif transaction.startswith(titles_tuple):
-                    temp_transaction = gw.getWindowsWithTitle(str(transaction))[0]
-                    temp_transaction.activate()
-                    while True:
-                        print('test')
-                        gui.locateOnScreen(transaction_names['new_mode'], region=(410, 30, 575, 60))
-                        gui.hotkey('ctrl', 'n')
-                        gui.locateOnScreen(transaction_names['sap_easy_access'], region=names_region)
-                        break
-                    print('konec')
-                    break
-                else:
-                    print('Не могу открыть')
+            self._new_mode()
 
     def zihp(self):
         self.sap_access()
@@ -80,14 +111,8 @@ class Transaction:
 
 if __name__ == '__main__':
     Transaction().zihp()
-    # sap = gw.getWindowsWithTitle('SAP Easy Access')[0]
+    # sap = gui.getWindowsWithTitle('SAP Easy Access')[0]
     # print(sap.title)
 # while True:
 #     gui.sleep(1)
-#     print(gw.getActiveWindow())
-
-
-
-
-
-
+#     print(gui.getActiveWindow())
